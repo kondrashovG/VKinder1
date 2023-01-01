@@ -155,9 +155,12 @@ class VKinderDB:
                             sel_ign)
                     VALUES
                         (%s, %s, %s)
-                    ON CONFLICT ON CONSTRAINT list_pk DO NOTHING     
-                    """, (vk_id, name, surname, birthday, city, gender, photo,
-                          name, surname, birthday, city, gender, photo, vk_id, owner_id, vk_id, sel_ign))
+                    ON CONFLICT ON CONSTRAINT list_pk DO
+                    UPDATE SET
+                        sel_ign=%s
+                    WHERE list.owner_id=%s AND list.vkid=%s
+                    """, (vk_id, name, surname, birthday, city, gender, photo, name, surname, birthday, city, gender,
+                          photo, vk_id, owner_id, vk_id, sel_ign, sel_ign, owner_id, vk_id))
                 self.connect.commit()
                 print(f'Выбранная запись {name} {surname} успешно добавлена')
             except OperationalError as e:

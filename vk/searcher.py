@@ -2,6 +2,7 @@ import configparser
 import vk_api
 import requests
 from pprint import pprint
+import time
 
 API_URL = 'https://api.vk.com/method/'
 # config = configparser.ConfigParser()  # создаём объекта парсера
@@ -68,6 +69,7 @@ class VK:
         pprint(response)
         for element in response['items']:
             id = element['id']
+            time.sleep(0.3)
             photo = self.get_vk_photo(id)
             if photo is not None:
                 person = [
