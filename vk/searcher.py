@@ -1,4 +1,3 @@
-import configparser
 import vk_api
 import requests
 from pprint import pprint
