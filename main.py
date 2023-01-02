@@ -43,7 +43,6 @@ if __name__ == "__main__":
             DB.insert_client(owner_id=client[0], name=client[1], surname=client[2],
                              birthday=client[3], city=client[4], gender=gender, photo=photos)
             cached_users.update([(msg.user_id, client)])
-            print("Всего1:", len(list_candidates))
         elif len(client[6]) == 0:
             client_sex = {1: 2, 2: 1}[client[5]]
             today = date.today()
@@ -53,7 +52,6 @@ if __name__ == "__main__":
             [black_list.append(i[0]) for i in DB.favorites_list(msg.user_id, False)]
             client[7] = black_list
             cached_users.update([(msg.user_id, client)])
-            print("Всего2:", len(client[6]))
         keyboard = VkKeyboard(one_time=True)
         keyboard.add_button('Следующий', color=VkKeyboardColor.POSITIVE)
         keyboard.add_button('Избранное', color=VkKeyboardColor.POSITIVE)
@@ -142,6 +140,8 @@ if __name__ == "__main__":
 
     def favorites(msg, b_w):
         global cached_users, candidate
+        if len(candidate[3]) < 6:
+            candidate[3] += '.' + cached_users[msg.user_id][3][-4:]
         DB.insert_selected(owner_id=msg.user_id, vk_id=candidate[0], sel_ign=b_w, name=candidate[1],
                            surname=candidate[2], birthday=candidate[3], city=cached_users[msg.user_id][4],
                            gender=not cached_users[msg.user_id][5], photo=candidate[5])

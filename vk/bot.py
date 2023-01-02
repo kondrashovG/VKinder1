@@ -45,16 +45,6 @@ class Bot:
         }
         return self.vk_session.method("messages.send", values)
 
-    # def send_message_event_answer(self, user, message=None, keyboard=None, attachments=None):
-    #     values = {
-    #         "event_id": event_id,
-    #         "user_id": user,
-    #         "peer_id": message,
-    #         "random_id": random.randint(-2147483648, +2147483648),
-    #         "keyboard": keyboard,
-    #         "attachment": attachments
-    #     }
-    #     return self.vk_session.method("messages.send", values)
 
     def infinity_polling(self):
         while True:

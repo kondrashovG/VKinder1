@@ -51,7 +51,6 @@ class VK:
                         index_size = k
                         max_url = j['url']
                 list_photos.update([(i['likes']['count'], max_url)])
-            # pprint(list_photos)
             return [sorted(list_photos.items(), key=lambda x: -x[0])[i][1] for i in range(min(3, len(list_photos)))]
 
     def search_users(self, sex, age_at, age_to, city):
@@ -66,7 +65,6 @@ class VK:
                                'hometown': city,
                                'fields': 'bdate'
                                })
-        pprint(response)
         for element in response['items']:
             id = element['id']
             time.sleep(0.3)
@@ -90,11 +88,13 @@ def main():
     # age_at = int(input("возраст от: "))
     # age_to = int(input("возраст до: "))
     # city = input("город: ")
-    find_people = VK(user_token, API_URL)
-    pprint(find_people.search_users(1, 59, 59, 'Мурманск'))
+    # find_people = VK(user_token, API_URL)
+    # pprint(find_people.search_users(1, 59, 59, 'Мурманск'))
 
 
 if __name__ == '__main__':
     main()
-    # find_people = VK('vk1.a.EXcM-MWTrqoYwMlsmlnBL94CzAkE2vxsPxVTbx_a3yEgw8hj9qzaL_ZlRhwpnFVCIwBIn0jbjPulTrFT041FdxfFQCBRLE4d79WH8QFxMo-EGqlIrflJUMBJOxggWOOUJ6a2C_b08bSoqKkzeNf7YEuipLSor0sHdmLzNRwsL_J2fJWEGiIR5yQYvaFXXRMw', API_URL)
-    # pprint(find_people.get_info(68693273))
+    find_people = VK('vk1.a.EXcM-MWTrqoYwMlsmlnBL94CzAkE2vxsPxVTbx_a3yEgw8hj9qzaL_ZlRhwpnFVCIwBIn0jbjPulTrFT041FdxfFQCBRLE4d79WH8QFxMo-EGqlIrflJUMBJOxggWOOUJ6a2C_b08bSoqKkzeNf7YEuipLSor0sHdmLzNRwsL_J2fJWEGiIR5yQYvaFXXRMw', API_URL)
+    pprint(find_people.get_info(452669551))
+    pprint(find_people.get_vk_photo(452669551))
+    pprint(find_people.search_users(1, 59, 59, 'Мурманск'))
