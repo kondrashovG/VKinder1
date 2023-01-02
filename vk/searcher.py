@@ -5,10 +5,6 @@ from pprint import pprint
 import time
 
 API_URL = 'https://api.vk.com/method/'
-# config = configparser.ConfigParser()  # создаём объекта парсера
-# config.read("..\settings.ini")  # читаем конфиг
-# comm_token = config["Tokens"]["comm"]
-# user_token = config["Tokens"]["VK"]
 
 
 class VK:
@@ -80,21 +76,3 @@ class VK:
                 ]
                 all_persons.append(person)
         return all_persons
-
-
-def main():
-    user_token = 'vk1.a.EXcM-MWTrqoYwMlsmlnBL94CzAkE2vxsPxVTbx_a3yEgw8hj9qzaL_ZlRhwpnFVCIwBIn0jbjPulTrFT041FdxfFQCBRLE4d79WH8QFxMo-EGqlIrflJUMBJOxggWOOUJ6a2C_b08bSoqKkzeNf7YEuipLSor0sHdmLzNRwsL_J2fJWEGiIR5yQYvaFXXRMw'
-    # sex = int(input('введите пол \n 1 - женский, \n 2 - мужской: '))
-    # age_at = int(input("возраст от: "))
-    # age_to = int(input("возраст до: "))
-    # city = input("город: ")
-    # find_people = VK(user_token, API_URL)
-    # pprint(find_people.search_users(1, 59, 59, 'Мурманск'))
-
-
-if __name__ == '__main__':
-    main()
-    find_people = VK('vk1.a.EXcM-MWTrqoYwMlsmlnBL94CzAkE2vxsPxVTbx_a3yEgw8hj9qzaL_ZlRhwpnFVCIwBIn0jbjPulTrFT041FdxfFQCBRLE4d79WH8QFxMo-EGqlIrflJUMBJOxggWOOUJ6a2C_b08bSoqKkzeNf7YEuipLSor0sHdmLzNRwsL_J2fJWEGiIR5yQYvaFXXRMw', API_URL)
-    pprint(find_people.get_info(452669551))
-    pprint(find_people.get_vk_photo(452669551))
-    pprint(find_people.search_users(1, 59, 59, 'Мурманск'))
