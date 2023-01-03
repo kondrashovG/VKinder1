@@ -15,11 +15,11 @@ if __name__ == "__main__":
     user_token = config["Tokens"]["VK"]
     VK1 = vk.searcher.VK(user_token, config["Urls"]["API_URL"])
     DB = database.VKinderDB(password='postgres')
-    cached_users = {} # cловарь клиентов в текущем сеансе бота. Ключ - VKid клиента, значение - список данных клиента
-    candidate = [] # список кандидатов клиента, полученных по запросу из VK
-    some_list = [] # список (Избранное или Чёрный список)
-    current = [] # текущая запись из some_list
-    what_list = True # признак списка (True - Избранное, False - Чёрный список)
+    cached_users = {}  # cловарь клиентов в текущем сеансе бота. Ключ - VKid клиента, значение - список данных клиента
+    candidate = []  # список кандидатов клиента, полученных по запросу из VK
+    some_list = []  # список (Избранное или Чёрный список)
+    current = []  # текущая запись из some_list
+    what_list = True  # признак списка (True - Избранное, False - Чёрный список)
 
 
     @bot.message_handler("Начать")  # Декоратор добавляющий обработчик на определённое сообщение
