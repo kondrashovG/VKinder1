@@ -7,23 +7,34 @@ from datetime import date, datetime
 import vk.searcher
 
 if __name__ == "__main__":
-    API_URL = 'https://api.vk.com/method/'
+    # API_URL = 'https://api.vk.com/method/'
     config = configparser.ConfigParser()  # создаём объекта парсера
     config.read("settings.ini")  # читаем конфиг
     bot = vk.bot.Bot(config["Tokens"]["bot"])
     comm_token = config["Tokens"]["comm"]
     user_token = config["Tokens"]["VK"]
-    VK1 = vk.searcher.VK(user_token, API_URL)
+    VK1 = vk.searcher.VK(user_token, config["Urls"]["API_URL"])
     DB = database.VKinderDB(password='postgres')
-    cached_users = {}
-    candidate = []
-    some_list = []
-    current = []
-    what_list = True
+    cached_users = {}  # cловарь клиентов в текущем сеансе бота. Ключ - VKid клиента, значение - список данных клиента
+    candidate = []  # список кандидатов клиента, полученных по запросу из VK
+    some_list = []  # список (Избранное или Чёрный список)
+    current = []  # текущая запись из some_list
+    what_list = True  # признак списка (True - Избранное, False - Чёрный список)
 
 
     @bot.message_handler("Начать")  # Декоратор добавляющий обработчик на определённое сообщение
     def hello(msg):
+        """
+        :param msg: содержит VKid клиента (msg.user_id)
+        :return: nothing
+
+        Начальная процедура диалога с клиентом. Выводится приветствие в чате, в БД вносятся данные о клиенте. Из БД
+        извлекается Чёрный список его кандидатов. Из VK поисковый запрос формирует список кандидатов для клиента.
+        Для продолжения формируются 3 кнопки:
+            Следующий - перейти к просмотру следующего кандидата
+            Избранное - перейти к просмотру списка Избранных клиента
+            Чёрный список - перейти к просмотру Чёрного списка
+        """
         global cached_users, candidate
         client = cached_users.get(msg.user_id)
         black_list = []
@@ -62,6 +73,20 @@ if __name__ == "__main__":
 
     @bot.message_handler("Следующий")
     def find_vk(msg):
+        """
+        :param msg: содержит VKid клиента (msg.user_id)
+        :return: nothing
+
+        Процедура обработки текущего кандидата из VK. В чате выводится информация о кандидате, 3 его самых популярных
+        фото, ссылка на профиль. Если кандидат в Чёрном списке, он пропускается, обрабатываются следующий.
+        Для продолжения формируются 3 кнопки:
+            Следующий - перейти к просмотру следующего кандидата
+            Запомнить - внести кандидата в список Избранных
+            В чёрный список - внести кандидата в Чёрный список
+        Если список кандидатов исчерпан, предлагается 1 кнопка:
+            Начать - начать диалог сначала (процедура hello).
+        Специальной кнопки окончания чата не предусмотрено. Клиент может закрыть чат в любой момент.
+        """
         global cached_users, candidate
         keyboard = VkKeyboard(one_time=True)
         while True:
@@ -87,28 +112,58 @@ if __name__ == "__main__":
 
     @bot.message_handler("Запомнить")
     def call_list1(msg):
+        """
+            :param msg: содержит VKid клиента (msg.user_id)
+            :return: nothing
+
+            Процедура инициирует вызов функции favorites для добавления кандидата в список Избранных
+        """
         favorites(msg, True)
 
 
     @bot.message_handler("В чёрный список")
     def call_list2(msg):
+        """
+            :param msg: содержит VKid клиента (msg.user_id)
+            :return: nothing
+
+            Процедура инициирует вызов функции favorites для добавления кандидата в Чёрный список
+        """
         favorites(msg, False)
 
 
     @bot.message_handler("Избранное")
     def call_list3(msg):
+        """
+            :param msg: содержит VKid клиента (msg.user_id)
+            :return: nothing
+
+            Процедура инициирует вызов функции list_check для просмотра списка Избранных
+        """
         print('См. Избранное')
         list_check(msg, True)
 
 
     @bot.message_handler("Чёрный список")
     def call_list4(msg):
+        """
+            :param msg: содержит VKid клиента (msg.user_id)
+            :return: nothing
+
+            Процедура инициирует вызов функции list_check для просмотра Чёрного списка
+        """
         print('См. Чёрный список')
         list_check(msg, False)
 
 
     @bot.message_handler("Удалить из списка")
     def del_from_list(msg):
+        """
+            :param msg: содержит VKid клиента (msg.user_id)
+            :return: nothing
+
+            Процедура для удаления записи из Чёрного списка или списка Избранных
+        """
         global some_list, current
         DB.delete_from_list(owner_id=msg.user_id, vk_id=current[0])
         keyboard = VkKeyboard(one_time=True)
@@ -121,6 +176,18 @@ if __name__ == "__main__":
 
     @bot.message_handler("Следующий из списка")
     def next_from_list(msg):
+        """
+            :param msg: содержит VKid клиента (msg.user_id)
+            :return: nothing
+
+            Процедура для обработки текущей записи из Чёрного списка или списка Избранных. В чате выводится информация о
+        кандидате, 3 его фото, ссылка на профиль.
+        Для продолжения формируются 2 кнопки:
+            Следующий из списка - перейти к просмотру следующей записи в списке
+            Удалить из списка - удалить кандидата из просматриваемого списка
+        Если список кандидатов исчерпан, предлагается 1 кнопка:
+            Начать - начать диалог сначала (процедура hello).
+        """
         global some_list, current, what_list
         keyboard = VkKeyboard(one_time=True)
         if len(some_list) == 0:
@@ -139,12 +206,23 @@ if __name__ == "__main__":
 
 
     def favorites(msg, b_w):
+        """
+            :param msg: содержит VKid клиента (msg.user_id)
+            :param b_w: True - список Избранных, False - Чёрный список
+            :return: nothing
+
+        Процедура добавляет кандидата в Чёрный список или список Избранных. Информация о кандидате заносится в
+            БД VKinder.
+        Для продолжения предлагается 1 кнопка:
+            Следующий - перейти к просмотру следующего кандидата
+        """
         global cached_users, candidate
         if len(candidate[3]) < 6:
             candidate[3] += '.' + cached_users[msg.user_id][3][-4:]
+        print(cached_users[msg.user_id][5])
         DB.insert_selected(owner_id=msg.user_id, vk_id=candidate[0], sel_ign=b_w, name=candidate[1],
                            surname=candidate[2], birthday=candidate[3], city=cached_users[msg.user_id][4],
-                           gender=not cached_users[msg.user_id][5], photo=candidate[5])
+                           gender=(cached_users[msg.user_id][5]==1), photo=candidate[5])
         keyboard = VkKeyboard(one_time=True)
         keyboard.add_button('Следующий', color=VkKeyboardColor.POSITIVE)
         keyboard = keyboard.get_keyboard()
@@ -154,6 +232,14 @@ if __name__ == "__main__":
 
 
     def list_check(msg, b_w):
+        """
+            :param msg: содержит VKid клиента (msg.user_id)
+            :param b_w: True - список Избранных, False - Чёрный список
+            :return: nothing
+
+        Процедура извлекает из БД VKinder Чёрный список или список Избранных. Затем вызывает процедуру
+        next_from_list, предназначенной для работы с элементами извлеченного списка.
+        """
         global some_list, what_list
         what_list = b_w
         some_list = []
