@@ -31,9 +31,9 @@ if __name__ == "__main__":
         Начальная процедура диалога с клиентом. Выводится приветствие в чате, в БД вносятся данные о клиенте. Из БД
         извлекается Чёрный список его кандидатов. Из VK поисковый запрос формирует список кандидатов для клиента.
         Для продолжения формируются 3 кнопки:
-            → - перейти к просмотру следующего кандидата
-            ❤ - перейти к просмотру списка Избранных клиента
-            ❌ - перейти к просмотру Чёрного списка
+            → - перейти к просмотру следующего кандидата, синяя кнопка
+            ❤ - перейти к просмотру списка Избранных клиента, зелёная кнопка
+            ❌ - перейти к просмотру Чёрного списка, белая кнопка
         """
         global cached_users, candidate
         client = cached_users.get(msg.user_id)
@@ -64,12 +64,13 @@ if __name__ == "__main__":
             client[7] = black_list
             cached_users.update([(msg.user_id, client)])
         keyboard = VkKeyboard(one_time=True)
-        keyboard.add_button('→', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('→', color=VkKeyboardColor.PRIMARY)
         keyboard.add_button('❤', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_button('❌', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('❌', color=VkKeyboardColor.SECONDARY)
         keyboard = keyboard.get_keyboard()
         s_msg = f'{client[0]}, {client[4]}\nЗдравствуйте, {client[1]} {client[2]}\nНазначение кнопок:\n' \
-                f'❤ - просмотр Избранных\n❌ - просмотр Чёрного списка\n→ - следующий кандидат'
+                f'❤ - просмотр Избранных(зелёная кнопка)\n❌ - просмотр Чёрного списка(белая кнопка)\n' \
+                f'→ - следующий кандидат(синяя кнопка)'
         bot.send_message(msg.user_id, s_msg, keyboard)
 
 
@@ -82,18 +83,18 @@ if __name__ == "__main__":
         Процедура обработки текущего кандидата из VK. В чате выводится информация о кандидате, 3 его самых популярных
         фото, ссылка на профиль. Если кандидат в Чёрном списке, он пропускается, обрабатываются следующий.
         Для продолжения формируются 3 кнопки:
-            → - перейти к просмотру следующего кандидата
-            →❤ - внести кандидата в список Избранных
-            →❌ - внести кандидата в Чёрный список
+            → - перейти к просмотру следующего кандидата, синяя кнопка
+            →❤ - внести кандидата в список Избранных, зелёная кнопка
+            →❌ - внести кандидата в Чёрный список, белая кнопка
         Если список кандидатов исчерпан, предлагается 1 кнопка:
-            Начать - начать диалог сначала (процедура hello).
+            Начать - начать диалог сначала (процедура hello), синяя кнопка
         Специальной кнопки окончания чата не предусмотрено. Клиент может закрыть чат в любой момент.
         """
         global cached_users, candidate
         keyboard = VkKeyboard(one_time=True)
         while True:
             if len(cached_users.get(msg.user_id)[6]) == 0:
-                keyboard.add_button('Начать', color=VkKeyboardColor.POSITIVE)
+                keyboard.add_button('Начать', color=VkKeyboardColor.PRIMARY)
                 keyboard = keyboard.get_keyboard()
                 bot.send_message(msg.user_id,
                                  f'Список выборки из VK закончился. Если хотите начать заново, нажмите "Начать"',
@@ -103,14 +104,15 @@ if __name__ == "__main__":
             if candidate[0] not in cached_users.get(msg.user_id)[7]:
                 break
         keyboard.add_button('→❤', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_button('→❌', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_button('→', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('→❌', color=VkKeyboardColor.SECONDARY)
+        keyboard.add_button('→', color=VkKeyboardColor.PRIMARY)
         keyboard = keyboard.get_keyboard()
         photos = ''
         for i in candidate[5]:
             photos += bot.create_photo_attachment(i) + ','
         s_msg = f'{candidate[1]} {candidate[2]}\n{candidate[3]}\n{candidate[4]}\nНазначение кнопок:\n' \
-                f'→❤ - записать в Избранные\n→❌ - внести в Чёрный список\n→ - следующий кандидат'
+                f'→❤ - записать в Избранные(зелёная кнопка)\n→❌ - внести в Чёрный список(белая кнопка)\n' \
+                f'→ - следующий кандидат(синяя кнопка)'
         bot.send_message(msg.user_id, s_msg, keyboard, photos)
 
 
@@ -171,7 +173,7 @@ if __name__ == "__main__":
         global some_list, current
         DB.delete_from_list(owner_id=msg.user_id, vk_id=current[0])
         keyboard = VkKeyboard(one_time=True)
-        keyboard.add_button('⇒', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('⇒', color=VkKeyboardColor.PRIMARY)
         keyboard = keyboard.get_keyboard()
         w_l = {True: '❤', False: '❌'}[what_list]
         bot.send_message(msg.user_id, f'запись {current[1]} {current[2]}\n{current[3]}\n удалена из {w_l}',
@@ -187,15 +189,15 @@ if __name__ == "__main__":
             Процедура для обработки текущей записи из Чёрного списка или списка Избранных. В чате выводится информация о
         кандидате, 3 его фото, ссылка на профиль.
         Для продолжения формируются 2 кнопки:
-            ⇒ - перейти к просмотру следующей записи в списке
-            ✖ - удалить кандидата из просматриваемого списка
+            ⇒ - перейти к просмотру следующей записи в списке, синяя кнопка
+            ✖ - удалить кандидата из просматриваемого списка, белая кнопка
         Если список кандидатов исчерпан, предлагается 1 кнопка:
-            Начать - начать диалог сначала (процедура hello).
+            Начать - начать диалог сначала (процедура hello), синяя кнопка
         """
         global some_list, current, what_list
         keyboard = VkKeyboard(one_time=True)
         if len(some_list) == 0:
-            keyboard.add_button('Начать', color=VkKeyboardColor.POSITIVE)
+            keyboard.add_button('Начать', color=VkKeyboardColor.PRIMARY)
             keyboard = keyboard.get_keyboard()
             w_l = {True: '❤', False: '❌'}[what_list]
             bot.send_message(msg.user_id, f'Список {w_l} закончился. Для продолжения нажмите "Начать"', keyboard)
@@ -204,11 +206,11 @@ if __name__ == "__main__":
         photos = ''
         for i in current[5]:
             photos += bot.create_photo_attachment(i) + ','
-        keyboard.add_button('✖', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_button('⇒', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('✖', color=VkKeyboardColor.SECONDARY)
+        keyboard.add_button('⇒', color=VkKeyboardColor.PRIMARY)
         keyboard = keyboard.get_keyboard()
         s_msg = f'{current[1]} {current[2]}\n{current[3]}\nНазначение кнопок:\n' \
-                f'✖ - удалить из списка\n⇒ - следующий кандидат из списка'
+                f'✖ - удалить из списка(белая кнопка)\n⇒ - следующий кандидат из списка(синяя кнопка)'
         bot.send_message(msg.user_id, s_msg, keyboard, photos)
 
 
@@ -221,7 +223,7 @@ if __name__ == "__main__":
         Процедура добавляет кандидата в Чёрный список или список Избранных. Информация о кандидате заносится в
             БД VKinder.
         Для продолжения предлагается 1 кнопка:
-            → - перейти к просмотру следующего кандидата
+            → - перейти к просмотру следующего кандидата, синяя кнопка
         """
         global cached_users, candidate
         if len(candidate[3]) < 6:
@@ -231,7 +233,7 @@ if __name__ == "__main__":
                            surname=candidate[2], birthday=candidate[3], city=cached_users[msg.user_id][4],
                            gender=(cached_users[msg.user_id][5] == 1), photo=candidate[5])
         keyboard = VkKeyboard(one_time=True)
-        keyboard.add_button('→', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('→', color=VkKeyboardColor.PRIMARY)
         keyboard = keyboard.get_keyboard()
         w_l = {True: 'Избранные', False: 'чёрный список'}[b_w]
         bot.send_message(msg.user_id, f'запись {candidate[1]} {candidate[2]}\n{candidate[3]}\n добавлена в {w_l}',
