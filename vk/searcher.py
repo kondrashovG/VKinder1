@@ -1,9 +1,9 @@
 import vk_api
 import requests
-from pprint import pprint
+# from pprint import pprint
 import time
 
-API_URL = 'https://api.vk.com/method/'
+# API_URL = 'https://api.vk.com/method/'
 
 
 class VK:
@@ -14,7 +14,7 @@ class VK:
 
     def get_info(self, user_ids):
         method = 'users.get'
-        url = API_URL + method
+        url = self.API_URL + method
         params = {
             'user_ids': user_ids,
             'access_token': self.user_token,
@@ -35,7 +35,7 @@ class VK:
             'album_id': 'profile',
             'extended': '1'
         }
-        response = requests.get(url=API_URL + metod, params=params)
+        response = requests.get(url=self.API_URL + metod, params=params)
         photo = response.json()
         if 'response' in photo.keys():
             for i in photo['response']['items']:
