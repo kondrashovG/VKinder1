@@ -105,14 +105,19 @@ if __name__ == "__main__":
                 break
         keyboard.add_button('→❤', color=VkKeyboardColor.POSITIVE)
         keyboard.add_button('→❌', color=VkKeyboardColor.SECONDARY)
+        keyboard.add_button('❤', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('❌', color=VkKeyboardColor.SECONDARY)
+        keyboard.add_line()
         keyboard.add_button('→', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('Начать', color=VkKeyboardColor.PRIMARY)
         keyboard = keyboard.get_keyboard()
         photos = ''
         for i in candidate[5]:
             photos += bot.create_photo_attachment(i) + ','
         s_msg = f'{candidate[1]} {candidate[2]}\n{candidate[3]}\n{candidate[4]}\nНазначение кнопок:\n' \
                 f'→❤ - записать в Избранные(зелёная кнопка)\n→❌ - внести в Чёрный список(белая кнопка)\n' \
-                f'→ - следующий кандидат(синяя кнопка)'
+                f'❤ - просмотр Избранных(зелёная кнопка)\n❌ - просмотр Чёрного списка(белая кнопка)\n' \
+                f'→ - следующий кандидат(синяя кнопка)\nДля повтора поиска нажмите "Начать"(синяя кнопка)'
         bot.send_message(msg.user_id, s_msg, keyboard, photos)
 
 
@@ -173,11 +178,17 @@ if __name__ == "__main__":
         global some_list, current
         DB.delete_from_list(owner_id=msg.user_id, vk_id=current[0])
         keyboard = VkKeyboard(one_time=True)
+        keyboard.add_button('❤', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('❌', color=VkKeyboardColor.SECONDARY)
         keyboard.add_button('⇒', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('Начать', color=VkKeyboardColor.PRIMARY)
         keyboard = keyboard.get_keyboard()
         w_l = {True: '❤', False: '❌'}[what_list]
-        bot.send_message(msg.user_id, f'запись {current[1]} {current[2]}\n{current[3]}\n удалена из {w_l}',
-                         keyboard)
+        s_msg = f'запись {current[1]} {current[2]}\n{current[3]}\n удалена из {w_l}\nНазначение кнопок:\n' \
+                f'❤ - просмотр Избранных(зелёная кнопка)\n❌ - просмотр Чёрного списка(белая кнопка)\n' \
+                f'⇒ - следующий кандидат из списка {w_l}(синяя кнопка)\n' \
+                f'Для повтора поиска нажмите "Начать"(синяя кнопка)'
+        bot.send_message(msg.user_id, s_msg, keyboard)
 
 
     @bot.message_handler("⇒")
@@ -196,21 +207,27 @@ if __name__ == "__main__":
         """
         global some_list, current, what_list
         keyboard = VkKeyboard(one_time=True)
+        keyboard.add_button('❤', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('❌', color=VkKeyboardColor.SECONDARY)
+        bot.send_message(msg.user_id,
+                         f'❤ - просмотр Избранных(зелёная кнопка)\n❌ - просмотр Чёрного списка(белая кнопка)\n')
+        keyboard.add_button('Начать', color=VkKeyboardColor.PRIMARY)
         if len(some_list) == 0:
-            keyboard.add_button('Начать', color=VkKeyboardColor.PRIMARY)
             keyboard = keyboard.get_keyboard()
             w_l = {True: '❤', False: '❌'}[what_list]
-            bot.send_message(msg.user_id, f'Список {w_l} закончился. Для продолжения нажмите "Начать"', keyboard)
+            bot.send_message(msg.user_id, f'Список {w_l} закончился. Для повтора поиска нажмите "Начать"', keyboard)
             return
         current = some_list.pop()
         photos = ''
         for i in current[5]:
             photos += bot.create_photo_attachment(i) + ','
+        keyboard.add_line()
         keyboard.add_button('✖', color=VkKeyboardColor.SECONDARY)
         keyboard.add_button('⇒', color=VkKeyboardColor.PRIMARY)
         keyboard = keyboard.get_keyboard()
         s_msg = f'{current[1]} {current[2]}\n{current[3]}\nНазначение кнопок:\n' \
-                f'✖ - удалить из списка(белая кнопка)\n⇒ - следующий кандидат из списка(синяя кнопка)'
+                f'✖ - удалить из списка(белая кнопка)\n⇒ - следующий кандидат из списка(синяя кнопка)\n' \
+                f'Для повтора поиска нажмите "Начать"(синяя кнопка)'
         bot.send_message(msg.user_id, s_msg, keyboard, photos)
 
 
