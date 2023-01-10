@@ -70,7 +70,7 @@ if __name__ == "__main__":
         keyboard = keyboard.get_keyboard()
         s_msg = f'{client[0]}, {client[4]}\nЗдравствуйте, {client[1]} {client[2]}\nНазначение кнопок:\n' \
                 f'❤ - просмотр Избранных(зелёная кнопка)\n❌ - просмотр Чёрного списка(белая кнопка)\n' \
-                f'→ - следующий кандидат(синяя кнопка)'
+                f'→ - следующий кандидат(синяя кнопка)\nВозраст для поиска: {client_age}\n'
         bot.send_message(msg.user_id, s_msg, keyboard)
 
 
@@ -180,18 +180,18 @@ if __name__ == "__main__":
         keyboard = VkKeyboard(one_time=True)
         keyboard.add_button('❤', color=VkKeyboardColor.POSITIVE)
         keyboard.add_button('❌', color=VkKeyboardColor.SECONDARY)
-        keyboard.add_button('⇒', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('►', color=VkKeyboardColor.PRIMARY)
         keyboard.add_button('Начать', color=VkKeyboardColor.PRIMARY)
         keyboard = keyboard.get_keyboard()
         w_l = {True: '❤', False: '❌'}[what_list]
         s_msg = f'запись {current[1]} {current[2]}\n{current[3]}\n удалена из {w_l}\nНазначение кнопок:\n' \
                 f'❤ - просмотр Избранных(зелёная кнопка)\n❌ - просмотр Чёрного списка(белая кнопка)\n' \
-                f'⇒ - следующий кандидат из списка {w_l}(синяя кнопка)\n' \
+                f'► - следующий кандидат из списка {w_l}(синяя кнопка)\n' \
                 f'Для повтора поиска нажмите "Начать"(синяя кнопка)'
         bot.send_message(msg.user_id, s_msg, keyboard)
 
 
-    @bot.message_handler("⇒")
+    @bot.message_handler("►")
     def next_from_list(msg):
         """
             :param msg: содержит VKid клиента (msg.user_id)
@@ -200,7 +200,7 @@ if __name__ == "__main__":
             Процедура для обработки текущей записи из Чёрного списка или списка Избранных. В чате выводится информация о
         кандидате, 3 его фото, ссылка на профиль.
         Для продолжения формируются 2 кнопки:
-            ⇒ - перейти к просмотру следующей записи в списке, синяя кнопка
+            ► - перейти к просмотру следующей записи в списке, синяя кнопка
             ✖ - удалить кандидата из просматриваемого списка, белая кнопка
         Если список кандидатов исчерпан, предлагается 1 кнопка:
             Начать - начать диалог сначала (процедура hello), синяя кнопка
@@ -223,10 +223,10 @@ if __name__ == "__main__":
             photos += bot.create_photo_attachment(i) + ','
         keyboard.add_line()
         keyboard.add_button('✖', color=VkKeyboardColor.SECONDARY)
-        keyboard.add_button('⇒', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('►', color=VkKeyboardColor.PRIMARY)
         keyboard = keyboard.get_keyboard()
         s_msg = f'{current[1]} {current[2]}\n{current[3]}\nНазначение кнопок:\n' \
-                f'✖ - удалить из списка(белая кнопка)\n⇒ - следующий кандидат из списка(синяя кнопка)\n' \
+                f'✖ - удалить из списка(белая кнопка)\n► - следующий кандидат из списка(синяя кнопка)\n' \
                 f'Для повтора поиска нажмите "Начать"(синяя кнопка)'
         bot.send_message(msg.user_id, s_msg, keyboard, photos)
 
