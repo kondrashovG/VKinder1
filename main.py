@@ -44,7 +44,7 @@ if __name__ == "__main__":
             today = date.today()
             birth_date = datetime.strptime(client["bdate"], '%d.%m.%Y')
             client_age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-            client_city = client["city"]["title"]
+            client_city = client["city"]["id"]
             [black_list.append(i[0]) for i in DB.favorites_list(msg.user_id, False)]
             list_candidates = VK1.search_users(sex=client_sex, age_at=client_age, age_to=client_age, city=client_city)
             client = [client["id"], client["first_name"], client["last_name"], client["bdate"], client_city,
