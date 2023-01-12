@@ -23,6 +23,7 @@ class VK:
         }
         res = requests.get(url, params=params)
         response = res.json().get("response")
+        print(response)
         return response
 
     def get_vk_photo(self, id):
@@ -57,7 +58,7 @@ class VK:
                                'sex': sex,
                                'age_from': age_at,
                                'age_to': age_to,
-                               'hometown': city,
+                               'city': city,
                                'fields': 'bdate'
                                })
         for element in response['items']:
